@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MetaMask Test</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+<div id="app">
+  <v-app>
+    <v-main style="background-color: #D3D3D3;">
+      <v-card style="width: 80%; margin: 20px auto auto auto;">
+        <h1 style="color:red; text-align: center; padding-top: 10px;">METAMASK</h1>
+        <div style="display: flex; padding-bottom: 20px;">
+          <div style="width: 100%; text-align: end;">
+            <h4 style="color:#4A4DFF;">Name Network</h4>
+            <h4 style="color:#4A4DFF;">ChainID</h4>
+            <h4 style="color:#4A4DFF;">Address</h4>
+            <h4 style="color:#4A4DFF;">Balance</h4>
+            <h4 style="color:#4A4DFF;">Gas Price</h4>
+          </div>
+          <div style="width: 5px; margin: 10px;"></div>
+          <div style="width: 100%;">
+            <h4>{{metamask.nameNetwork}}</h4>
+            <h4>{{metamask.chainId}}</h4>
+            <h4>{{metamask.address}}</h4>
+            <h4>{{metamask.balance}}</h4>
+            <h4>{{metamask.gasPrice}} </h4>
+          </div>
+        </div>
+      </v-card>
+
+
+      <div style="display: flex; width: 80%; margin: 20px auto auto auto;">
+        <v-text-field style="width: 70%;" label="address" v-model="metamask.sendETH.address" solo></v-text-field>
+        <v-text-field style="width: 30%;" label="amount" v-model="metamask.sendETH.amount" solo></v-text-field>
+        <v-btn style="width: 30%; height: 48px;" @click="SendETH()">Send ETH</v-btn>
+      </div>
+      
+
+      <v-card style="width: 80%; margin: 0px auto 20px auto;">
+        <h3 style="color:orangered; text-align: center; padding-top: 10px;">SmartContract</h3>
+        <div style="display: flex; padding-bottom: 20px;">
+          <div style="width: 100%; text-align: end;">
+            <h4 style="color:#4A4DFF;">Symbol</h4>
+            <h4 style="color:#4A4DFF;">Name Network</h4>
+            <h4 style="color:#4A4DFF;">Address</h4>
+            <!-- <h4 style="color:#4A4DFF;">Balance</h4> -->
+            <h4 style="color:#4A4DFF;">Node URL</h4>
+          </div>
+          <div style="width: 5px; margin: 10px;"></div>
+          <div style="width: 100%;">
+            <h4>{{contract.symbol}}</h4>
+            <h4>{{contract.nameNetwork}}</h4>
+            <h4>{{contract.address}}</h4>
+            <!-- <h4>{{contract.balance}}</h4> -->
+            <h4>{{contract.nodeurl}}</h4>
+          </div>
+        </div>
+
+        <div style="display: flex; width: 80%; margin: 10px auto auto auto;">
+          <v-text-field style="width: 40%;" label="address" v-model="metamask.address" solo disabled></v-text-field>
+          <v-text-field style="width: 40%;" label="token address" v-model="contract.address" solo disabled></v-text-field>
+          <v-text-field style="width: 20%;" label="amount" v-model="contract.amount" solo></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="SendToken()">Send Token</v-btn>
+        </div>
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-text-field style="width: 100%;" label="amount" v-model="contract.faucet" solo></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="FaucetToken()">Faucet Token</v-btn>
+        </div>
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-text-field style="width: 100%;" label="amount" v-model="contract.burn" solo></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="BurnToken()">Burn Token</v-btn>
+        </div>
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-text-field style="width: 100%;" label="balance" v-model="contract.balance" solo disabled></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="GetBalanceToken()">Get Balance Token</v-btn>
+        </div>
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-text-field style="width: 100%;" label="Get Number" v-model="contract.getdata" disabled solo></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="ReadSmartContract()">Read SmartContract</v-btn>
+        </div>
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-text-field style="width: 100%;" label="Set Number" v-model="contract.setdata" solo></v-text-field>
+          <v-btn style="width: 30%; height: 48px;" @click="RunSmartContract()">Run SmartContract</v-btn>
+        </div>
+      </v-card>
+    </v-main>
+  </v-app>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0/web3.min.js" integrity="sha512-C63V0mFzwl8KV2fRz0QJNKX0d9877urOLSUq5WUq8nUOhDl69hKdGr9mAvl57k47GNjqEMAtiufsvDnk7xs8+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    // import Web3 from 'web3';
+    // const axios = require("axios");
+
+    new Vue({
+      el: '#app',
+      delimiters: ['{{','}}'],
+      vuetify: new Vuetify(),
+      data: {
+        metamask : {
+                    nameNetwork:'',
+                    networkExplorer:'',
+                    chainId:'',
+                    address:'',
+                    balance:'0',
+                    gasPrice:'0',
+                    sendETH:{
+                      tokenAddress:"",
+                      address:"",
+                      amount:"",
+                      tx:"",
+                    }
+        },
+        smratContract:"",
+        contract:{
+          symbol:"",
+          nameNetwork:"Ropsten Test Network",
+          balance:"",
+          address:"0x0436e9874646943acc822f7db1de8073ee0a6637",
+          abi:[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"_owner","type":"address"},{"indexed":true,"internalType":"address","name":"_spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"_value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"_from","type":"address"},{"indexed":true,"internalType":"address","name":"_to","type":"address"},{"indexed":false,"internalType":"uint256","name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":false,"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"address","name":"_spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"burn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"faucet","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getNumber","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"number","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_number","type":"uint256"}],"name":"setNumber","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_from","type":"address"},{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}],
+          nodeurl:"https://ropsten.infura.io/v3/eda1db3253984f858d87d23366f20f4e",
+          getdata:'',
+          setdata:'',
+          faucet:"",
+          burn:"",
+          tx:""
+        }
+      },
+      mounted: function() {
+        const ethereum = window.ethereum
+        if (ethereum) {
+          console.log(ethereum)
+          console.log('Ethereum successfully detected!')
+          this.GetChainId()
+        } else {
+          console.log('Please install MetaMask!', error)
+          this.address = 'Please install MetaMask!'
+        } 
+
+        if (typeof(window.ethereum) !== 'undefined') {
+          console.log('MetaMask is installed!');
+        }
+
+        const web3 = new Web3(window.web3.currentProvider);
+        this.smratContract = new web3.eth.Contract(this.contract.abi,this.contract.address)
+        this.GetSymbol()
+      },
+      methods: {
+        GetChainId(){
+          // https://chainlist.org/
+          ethereum.request({ method: 'eth_chainId'}).then((res)=>{
+            this.metamask.chainId = parseInt(res)
+            switch(this.metamask.chainId) {
+              case 1:
+                this.metamask.nameNetwork = "Ethereum Main Network"
+                this.metamask.networkExplorer =  "https://etherscan.io/"
+                break;
+              case 3:
+                this.metamask.nameNetwork = "Ropsten Test Network"
+                this.metamask.networkExplorer =  "https://ropsten.etherscan.io/"
+                break;
+              default:
+                this.metamask.nameNetwork = "Unknow Network"
+                this.metamask.networkExplorer =  "/"
+            }
+            this.Login()
+          })
+        },
+        Login(){
+          ethereum.request({ method: 'eth_requestAccounts' }).then((res)=>{
+            console.log("Address : ",res)
+            this.GetAddress()
+            this.GetGasPrice()
+          });
+        },
+        GetAddress(){
+          ethereum.request({ method: 'eth_accounts' }).then((res)=>{
+            console.log("Address : ",res)
+            this.metamask.address = res[0]
+            this.GetBalance(this.metamask.address)
+          })
+        },
+        GetGasPrice(){
+          ethereum.request({
+            "method":"eth_gasPrice",
+            "params":[],
+            "id":73
+          }).then((res)=>{
+            console.log("GasPrice : ",res)
+            this.metamask.gasPrice = parseInt(res)
+          });
+        },
+        GetBalance(address){
+          ethereum.request({
+            method: 'eth_getBalance',
+            "params":[
+                      address, 
+                      "latest"
+                    ]
+          }).then((res)=>{
+            console.log("Balance ETH : ",res)
+            this.metamask.balance = parseInt(res)/10**18
+          })
+        },
+        SendETH(){
+          if(this.metamask.sendETH.amount == ""){
+            this.metamask.sendETH.amount = '0'
+          }
+          ethereum.request({
+            method: 'eth_sendTransaction',
+            "params":[{
+                        "from": this.metamask.address,
+                        "to": this.metamask.sendETH.address,
+                        "gas": "0x76c0",
+                        "gasPrice": "0x"+(45*10**9).toString(16),
+                        "value": "0x"+(parseFloat(this.metamask.sendETH.amount)*10**18).toString(16)
+                      }]
+          }).then((res)=>{
+            console.log("Send ETH")
+            console.log(this.metamask.networkExplorer+"tx/"+res)
+            this.metamask.sendETH.tx = res
+            this.GetBalance()
+          })
+        },
+        SendToken(){
+          var amount = (parseFloat(this.contract.amount)*10**18).toString()
+          this.smratContract.methods.transfer(this.metamask.address, amount).send({from:this.metamask.address}).then((tx)=>{
+            console.log("Send Token")
+            console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+            this.GetBalanceToken()
+          });
+        },
+        GetSymbol(){
+          this.smratContract.methods.symbol().call((err,res) => {
+            this.contract.symbol = res
+            console.log("Symbol : ",res)
+          })
+        },
+        FaucetToken(){
+          var faucet = (parseFloat(this.contract.faucet)*10**18).toString()
+          this.smratContract.methods.faucet(faucet).send({from:this.metamask.address}).then((tx)=>{
+            this.contract.faucet = ""
+            console.log("Faucet : ",this.contract.faucet)
+            console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+          });
+        },
+        BurnToken(){
+          var burn = (parseFloat(this.contract.burn)*10**18).toString()
+          this.smratContract.methods.burn(burn).send({from:this.metamask.address}).then((tx)=>{
+            this.contract.burn = ""
+            console.log("Burn : ",this.contract.burn)
+            console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+          });
+        },
+        GetBalanceToken(){
+          this.smratContract.methods.balanceOf(this.metamask.address).call().then((balance)=>{
+            balance = balance/(10**18)
+            this.contract.balance = balance
+            console.log("Token Balance : "+balance)
+          })
+        },
+        ReadSmartContract(){
+          this.smratContract.methods.getNumber().call({from:this.metamask.address}).then((res)=>{
+              this.contract.getdata = res
+              console.log("Get Number : ",res)
+          });
+        },
+        RunSmartContract(){
+          this.smratContract.methods.setNumber(this.contract.setdata).send({from:this.metamask.address}).then((tx)=>{
+            this.contract.setdata = ""
+            console.log("Set Number : ",this.contract.setdata)
+            console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+          });
+        },
+
+
+      }
+    })
+  </script>
+</body>
+</html>
