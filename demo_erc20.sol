@@ -131,7 +131,7 @@ contract ERC20 {
 }
 
 
-contract TST is StandardToken {
+contract Aofserver is StandardToken {
     using SafeMath for uint256;
     address public owner;
     string public name = 'aofserver';
