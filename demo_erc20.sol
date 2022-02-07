@@ -147,8 +147,8 @@ contract TST is StandardToken {
      }
     
     function faucet(uint256 _value) public {
-      require((balances[msg.sender] <= 100**18),"A token can contain no more than 100.");
-      require(balances[msg.sender].add(_value) <= 100**18,"A token can contain no more than 100.");
+      require((balances[msg.sender] <= 10*(10**18)),"A token can contain no more than 10 coins.");
+      require(balances[msg.sender].add(_value) <= 10*(10**18),"A token can contain no more than 10 coins.");
 
       totalSupply = totalSupply.add(_value);
       balances[msg.sender] = balances[msg.sender].add(_value);
