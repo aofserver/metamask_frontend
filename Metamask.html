@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>MetaMask Test</title>
+<link rel="icon" href="https://docs.metamask.io/metamask-fox.svg">
 <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
@@ -71,6 +72,10 @@
           </div>
         </div>
 
+        <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
+          <v-btn style="width: 100%; height: 48px;" @click="AddToken()">Add Token {{this.contract.symbol}}</v-btn>
+        </div>
+
         <div style="display: flex; width: 80%; margin: 10px auto auto auto;">
           <v-text-field style="width: 40%;" label="address" v-model="metamask.address" solo disabled></v-text-field>
           <v-text-field style="width: 40%;" label="token address" v-model="contract.address" solo disabled></v-text-field>
@@ -99,6 +104,80 @@
         </div>
       </v-card>
 
+      <v-dialog
+        v-model="dialog.transaction"
+        persistent
+        max-width="400"
+      >
+        <v-card>
+          <template v-if="transaction.tx_hash == ''">
+            <v-card-title class="text-h5" style="justify-content: center;">
+              Waiting transaction.
+            </v-card-title>
+            <v-card-text style="text-align: center;">Wait until the transaction is successful.</v-card-text>
+            <v-skeleton-loader
+              class="mx-auto"
+              max-width="300"
+              type="image"
+            ></v-skeleton-loader>
+            <v-skeleton-loader
+              class="mx-auto"
+              style="margin: 10px; height: 30px;"
+              max-width="200"
+              type="image"
+            ></v-skeleton-loader>
+          </template>
+          <template v-else>
+            <v-card-title class="text-h5" style="justify-content: center;">
+              Transaction.
+            </v-card-title>
+            <v-card-text style="text-align: center;">Scan the QR Code or <a target="_blank" :href="transaction.tx_url">click</a> to view the transaction.</v-card-text>
+            <div style="width: 200px; height: 200px; margin: 0 auto 0 auto;">
+              <img style="width: 100%;" :src="transaction.tx_qr" />
+            </div>
+            <p style="text-align: center; font-size: 10px;">{{transaction.tx_hash}}</p>
+          </template>
+          
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="red darken-1"
+              text
+              @click="dialog.transaction = false; transaction.tx_hash=''; transaction.tx_qr=''; transaction.tx_url='';"
+            >
+              ปิด
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
+        v-model="dialog.transaction_fail"
+        persistent
+        max-width="400"
+      >
+        <v-card>
+          <v-card-title class="text-h5" style="justify-content: center; color: red;">
+            Transaction Fail.
+          </v-card-title>
+          <v-card-text style="text-align: center;">Check functions condition in <a target="_blank" :href="contract.code">Smart Contract</a>.</v-card-text>
+          <div style="width: 200px; height: 200px; margin: 0 auto 0 auto;">
+            <img style="width: 100%;" :src="'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl='+contract.code+'&choe=UTF-8'" />
+          </div>
+          <p style="text-align: center; font-size: 15px;">Code Smart Contract</p>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="red darken-1"
+              text
+              @click="dialog.transaction_fail = false; transaction.tx_hash=''; transaction.tx_qr=''; transaction.tx_url='';"
+            >
+              ปิด
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
 
     </v-main>
   </v-app>
@@ -108,14 +187,12 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0/web3.min.js" integrity="sha512-C63V0mFzwl8KV2fRz0QJNKX0d9877urOLSUq5WUq8nUOhDl69hKdGr9mAvl57k47GNjqEMAtiufsvDnk7xs8+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    // import Web3 from 'web3';
-    // const axios = require("axios");
-
     new Vue({
       el: '#app',
       delimiters: ['{{','}}'],
       vuetify: new Vuetify(),
       data: {
+        dialog : {transaction:false,transaction_fail:false},
         metamask : {
                     nameNetwork:'',
                     networkExplorer:'',
@@ -127,7 +204,6 @@
                       tokenAddress:"",
                       address:"",
                       amount:"",
-                      tx:"",
                     },
                     addChain:{
                       rpc:"https://bsc-dataseed.binance.org/",
@@ -142,14 +218,19 @@
           symbol:"",
           nameNetwork:"Ropsten Test Network",
           balance:"",
-          address:"0x0436e9874646943acc822f7db1de8073ee0a6637",
+          address:"0x1892fFdBa4A50Ef4d4A692f3f07A32b18D0170e0",
           abi:[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"_owner","type":"address"},{"indexed":true,"internalType":"address","name":"_spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"_value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"_from","type":"address"},{"indexed":true,"internalType":"address","name":"_to","type":"address"},{"indexed":false,"internalType":"uint256","name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":false,"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"address","name":"_spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"burn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"faucet","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getNumber","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"number","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_number","type":"uint256"}],"name":"setNumber","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_from","type":"address"},{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}],
           nodeurl:"https://ropsten.infura.io/v3/eda1db3253984f858d87d23366f20f4e",
+          code:'',
           getdata:'',
           setdata:'',
           faucet:"",
           burn:"",
-          tx:""
+        },
+        transaction:{
+          tx_hash:"",
+          tx_url:"",
+          tx_qr:"",
         }
       },
       mounted: function() {
@@ -170,6 +251,7 @@
         const web3 = new Web3(window.web3.currentProvider);
         this.smratContract = new web3.eth.Contract(this.contract.abi,this.contract.address)
         this.GetSymbol()
+        
       },
       methods: {
         GetChainId(){
@@ -189,6 +271,7 @@
                 this.metamask.nameNetwork = "Unknow Network"
                 this.metamask.networkExplorer =  "/"
             }
+            this.contract.code = this.metamask.networkExplorer + "/address/"+this.contract.address+"#code"
             this.Login()
           })
         },
@@ -232,6 +315,8 @@
           if(this.metamask.sendETH.amount == ""){
             this.metamask.sendETH.amount = '0'
           }
+
+          this.dialog.transaction = true;
           ethereum.request({
             method: 'eth_sendTransaction',
             "params":[{
@@ -243,17 +328,34 @@
                       }]
           }).then((res)=>{
             console.log("Send ETH")
+            this.transaction.tx_hash = res
+            this.transaction.tx_url = this.metamask.networkExplorer+"tx/"+res
+            this.transaction.tx_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+this.transaction.tx_url+"&choe=UTF-8"
+
             console.log(this.metamask.networkExplorer+"tx/"+res)
             this.metamask.sendETH.tx = res
             this.GetBalance()
-          })
+          }).catch((err)=>{
+            console.log(err)
+            this.dialog.transaction_fail = true
+            this.dialog.transaction = false; this.transaction.tx_hash=''; this.transaction.tx_qr=''; this.transaction.tx_url='';
+          });
         },
         SendToken(){
+          this.dialog.transaction = true;
           var amount = (parseFloat(this.contract.amount)*10**18).toString()
           this.smratContract.methods.transfer(this.metamask.address, amount).send({from:this.metamask.address}).then((tx)=>{
+            this.transaction.tx_hash = tx.transactionHash
+            this.transaction.tx_url = this.metamask.networkExplorer+"tx/"+tx.transactionHash
+            this.transaction.tx_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+this.transaction.tx_url+"&choe=UTF-8"
+
             console.log("Send Token")
             console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
             this.GetBalanceToken()
+          }).catch((err)=>{
+            console.log(err)
+            this.dialog.transaction_fail = true
+            this.dialog.transaction = false; this.transaction.tx_hash=''; this.transaction.tx_qr=''; this.transaction.tx_url='';
           });
         },
         GetSymbol(){
@@ -263,19 +365,38 @@
           })
         },
         FaucetToken(){
+          this.dialog.transaction = true;
           var faucet = (parseFloat(this.contract.faucet)*10**18).toString()
           this.smratContract.methods.faucet(faucet).send({from:this.metamask.address}).then((tx)=>{
+            this.transaction.tx_hash = tx.transactionHash
+            this.transaction.tx_url = this.metamask.networkExplorer+"tx/"+tx.transactionHash
+            this.transaction.tx_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+this.transaction.tx_url+"&choe=UTF-8"
+
             this.contract.faucet = ""
             console.log("Faucet : ",this.contract.faucet)
             console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+            this.GetBalanceToken()
+          }).catch((err)=>{
+            console.log(err)
+            this.dialog.transaction_fail = true
+            this.dialog.transaction = false; this.transaction.tx_hash=''; this.transaction.tx_qr=''; this.transaction.tx_url='';
           });
         },
         BurnToken(){
+          this.dialog.transaction = true;
           var burn = (parseFloat(this.contract.burn)*10**18).toString()
           this.smratContract.methods.burn(burn).send({from:this.metamask.address}).then((tx)=>{
+            this.transaction.tx_hash = tx.transactionHash
+            this.transaction.tx_url = this.metamask.networkExplorer+"tx/"+tx.transactionHash
+            this.transaction.tx_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+this.transaction.tx_url+"&choe=UTF-8"
+
             this.contract.burn = ""
             console.log("Burn : ",this.contract.burn)
             console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+          }).catch((err)=>{
+            console.log(err)
+            this.dialog.transaction_fail = true
+            this.dialog.transaction = false; this.transaction.tx_hash=''; this.transaction.tx_qr=''; this.transaction.tx_url='';
           });
         },
         GetBalanceToken(){
@@ -287,15 +408,38 @@
         },
         ReadSmartContract(){
           this.smratContract.methods.getNumber().call({from:this.metamask.address}).then((res)=>{
-              this.contract.getdata = res
-              console.log("Get Number : ",res)
+            this.contract.getdata = res
+            console.log("Get Number : ",res)
           });
         },
         RunSmartContract(){
+          this.dialog.transaction = true;
           this.smratContract.methods.setNumber(this.contract.setdata).send({from:this.metamask.address}).then((tx)=>{
+            this.transaction.tx_hash = tx.transactionHash
+            this.transaction.tx_url = this.metamask.networkExplorer+"tx/"+tx.transactionHash
+            this.transaction.tx_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl="+this.transaction.tx_url+"&choe=UTF-8"
+
             this.contract.setdata = ""
             console.log("Set Number : ",this.contract.setdata)
             console.log(this.metamask.networkExplorer+"tx/"+tx.transactionHash)
+          }).catch((err)=>{
+            console.log(err)
+            this.dialog.transaction_fail = true
+            this.dialog.transaction = false; this.transaction.tx_hash=''; this.transaction.tx_qr=''; this.transaction.tx_url='';
+          });
+        },
+        AddToken(){
+          ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+              type: 'ERC20', 
+              options: {
+                address: this.contract.address,
+                symbol: this.contract.symbol, 
+                decimals: 18, 
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHeirlv-e6PtAMWDwXFS0EsXkStnIVRdeg7Q&usqp=CAU",
+              },
+            },
           });
         },
         AddChain(){
@@ -304,7 +448,6 @@
           this.metamask.addChain.chainId
           this.metamask.addChain.chainName
           this.metamask.addChain.blockExplorerUrls
-
 
           ethereum.request({
             id: 1,
@@ -324,7 +467,6 @@
               },
             ],
           })
-
         }
 
 
