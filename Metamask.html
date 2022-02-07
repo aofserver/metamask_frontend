@@ -11,8 +11,8 @@
 <body>
 <div id="app">
   <v-app>
-    <v-main style="background-color: #D3D3D3;">
-      <v-card style="width: 80%; margin: 20px auto auto auto;">
+    <v-main style="background-color: #7E7E7E;">
+      <v-card style="width: 80%; margin: 20px auto auto auto; background-color:#D3D3D3;">
         <h1 style="color:red; text-align: center; padding-top: 10px;">METAMASK</h1>
         <div style="display: flex; padding-bottom: 20px;">
           <div style="width: 100%; text-align: end;">
@@ -33,33 +33,28 @@
         </div>
         <div style="display: flex; width: 80%; margin: 20px auto auto auto;">
           <v-text-field style="width: 70%;" label="address" v-model="metamask.sendETH.address" solo></v-text-field>
-          <v-text-field style="width: 30%;" label="amount" v-model="metamask.sendETH.amount" solo></v-text-field>
+          <v-text-field type="number" style="width: 30%;" label="amount" v-model="metamask.sendETH.amount" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="SendETH()">Send ETH</v-btn>
         </div>
   
         <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
           <v-text-field style="width: 70%;" label="chain name" v-model="metamask.addChain.chainName" solo></v-text-field>
-          <v-text-field style="width: 30%;" label="chain id" v-model="metamask.addChain.chainId" solo></v-text-field>
+          <v-text-field type="number" style="width: 30%;" label="chain id" v-model="metamask.addChain.chainId" solo></v-text-field>
           <v-text-field style="width: 70%;" label="chain rpc" v-model="metamask.addChain.rpc" solo></v-text-field>
           <v-text-field style="width: 30%;" label="symbol" v-model="metamask.addChain.symbol" solo></v-text-field>
           <v-text-field style="width: 70%;" label="block explorer url" v-model="metamask.addChain.blockExplorerUrls" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="AddChain()">Add Chain</v-btn>
         </div>
       </v-card>
-
-
       
 
-      
-
-      <v-card style="width: 80%; margin: 20px auto 20px auto;">
+      <v-card style="width: 80%; margin: 20px auto 20px auto; background-color:#D3D3D3;">
         <h3 style="color:orangered; text-align: center; padding-top: 10px;">SmartContract</h3>
         <div style="display: flex; padding-bottom: 20px;">
           <div style="width: 100%; text-align: end;">
             <h4 style="color:#4A4DFF;">Symbol</h4>
             <h4 style="color:#4A4DFF;">Name Network</h4>
             <h4 style="color:#4A4DFF;">Address</h4>
-            <!-- <h4 style="color:#4A4DFF;">Balance</h4> -->
             <h4 style="color:#4A4DFF;">Node URL</h4>
           </div>
           <div style="width: 5px; margin: 10px;"></div>
@@ -67,7 +62,6 @@
             <h4>{{contract.symbol}}</h4>
             <h4>{{contract.nameNetwork}}</h4>
             <h4>{{contract.address}}</h4>
-            <!-- <h4>{{contract.balance}}</h4> -->
             <h4>{{contract.nodeurl}}</h4>
           </div>
         </div>
@@ -79,15 +73,15 @@
         <div style="display: flex; width: 80%; margin: 10px auto auto auto;">
           <v-text-field style="width: 40%;" label="address" v-model="metamask.address" solo disabled></v-text-field>
           <v-text-field style="width: 40%;" label="token address" v-model="contract.address" solo disabled></v-text-field>
-          <v-text-field style="width: 20%;" label="amount" v-model="contract.amount" solo></v-text-field>
+          <v-text-field type="number" style="width: 20%;" label="amount" v-model="contract.amount" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="SendToken()">Send Token</v-btn>
         </div>
         <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
-          <v-text-field style="width: 100%;" label="amount" v-model="contract.faucet" solo></v-text-field>
+          <v-text-field type="number" style="width: 100%;" label="amount" v-model="contract.faucet" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="FaucetToken()">Faucet Token</v-btn>
         </div>
         <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
-          <v-text-field style="width: 100%;" label="amount" v-model="contract.burn" solo></v-text-field>
+          <v-text-field type="number" style="width: 100%;" label="amount" v-model="contract.burn" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="BurnToken()">Burn Token</v-btn>
         </div>
         <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
@@ -99,7 +93,7 @@
           <v-btn style="width: 30%; height: 48px;" @click="ReadSmartContract()">Read SmartContract</v-btn>
         </div>
         <div style="display: flex; width: 80%; margin: 0px auto auto auto;">
-          <v-text-field style="width: 100%;" label="Set Number" v-model="contract.setdata" solo></v-text-field>
+          <v-text-field type="number" style="width: 100%;" label="Set Number" v-model="contract.setdata" solo></v-text-field>
           <v-btn style="width: 30%; height: 48px;" @click="RunSmartContract()">Run SmartContract</v-btn>
         </div>
       </v-card>
@@ -182,6 +176,31 @@
     </v-main>
   </v-app>
 </div>
+
+<style scoped>
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  h1, h2, h3, h4, h5, p, label, span{
+    font-family: "Kanit", sans-serif;
+  }
+
+  input{
+    text-align:center;
+    font-family: "Kanit", sans-serif;
+  }
+</style>
+
+
 <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -251,6 +270,9 @@
         const web3 = new Web3(window.web3.currentProvider);
         this.smratContract = new web3.eth.Contract(this.contract.abi,this.contract.address)
         this.GetSymbol()
+
+
+        setInterval(()=>{ this.Login(); }, 1000);
         
       },
       methods: {
@@ -277,16 +299,15 @@
         },
         Login(){
           ethereum.request({ method: 'eth_requestAccounts' }).then((res)=>{
-            console.log("Address : ",res)
-            this.GetAddress()
+            // console.log("Address : ",res)
+            this.metamask.address = res[0]
             this.GetGasPrice()
+            this.GetBalance(this.metamask.address)
           });
         },
         GetAddress(){
           ethereum.request({ method: 'eth_accounts' }).then((res)=>{
             console.log("Address : ",res)
-            this.metamask.address = res[0]
-            this.GetBalance(this.metamask.address)
           })
         },
         GetGasPrice(){
@@ -295,7 +316,7 @@
             "params":[],
             "id":73
           }).then((res)=>{
-            console.log("GasPrice : ",res)
+            // console.log("GasPrice : ",res)
             this.metamask.gasPrice = parseInt(res)
           });
         },
@@ -307,7 +328,7 @@
                       "latest"
                     ]
           }).then((res)=>{
-            console.log("Balance ETH : ",res)
+            // console.log("Balance ETH : ",res)
             this.metamask.balance = parseInt(res)/10**18
           })
         },
